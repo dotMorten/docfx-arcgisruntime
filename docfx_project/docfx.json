@@ -1,0 +1,120 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [ "src/100.6.0/net461/**.dll" ],
+        }
+      ],
+      "dest": "temp/api/netfx",
+	  "properties": { "TargetFramework": "net461" }
+    },
+	{
+      "src": [
+        {
+          "files": [ "src/100.6.0/MonoAndroid10/**.dll" ]
+        }
+      ],
+      "dest": "temp/api/android",
+	  "properties": { "TargetFramework": "MonoAndroid10" }
+    },
+	{
+      "src": [
+        {
+          "files": [ "src/100.6.0/netcoreapp3.0/**.dll" ]
+        }
+      ],
+      "dest": "temp/api/netcore",
+	  "properties": { "TargetFramework": "netcoreapp3.0" }
+    },
+	{
+      "src": [
+        {
+          "files": [ "src/100.6.0/netstandard2.0/**.dll" ]
+        }
+      ],
+      "dest": "temp/api/netstd",
+	  "properties": { "TargetFramework": "netstandard2.0" }
+    },
+	{
+      "src": [ { "files": [ "src/100.6.0/uap10.0.16299/**.dll" ] } ],
+      "dest": "temp/api/uwp",
+	  "properties": { "TargetFramework": "uap10.0.16299" }
+    },
+	{
+      "src": [ { "files": [ "src/100.6.0/Xamarin.iOS10/**.dll" ] } ],
+      "dest": "temp/api/ios",
+	  "properties": { "TargetFramework": "Xamarin.iOS10" }
+    }
+  ],
+  "merge": {
+        "content": [
+            { "files": "*.yml", "src": "temp/api/netfx", },
+			{ "files": "*.yml", "src": "temp/api/android", },
+			{ "files": "*.yml", "src": "temp/api/netcore", },
+			{ "files": "*.yml", "src": "temp/api/netstd", },
+			{ "files": "*.yml", "src": "temp/api/uwp", },
+			{ "files": "*.yml", "src": "temp/api/ios", }
+        ],
+        "fileMetadata": {
+            "platform": {
+                "temp/api/netfx/*.yml": [ "net461" ],
+				"temp/api/android/*.yml": [ "MonoAndroid10" ],
+				"temp/api/netcore/*.yml": [ "netcoreapp3.0" ],
+				"temp/api/netstd/*.yml": [ "netstandard2.0" ],
+				"temp/api/uwp/*.yml": [ "uap10.0.16299" ],
+				"temp/api/ios/*.yml": [ "Xamarin.iOS10" ],
+            }
+        },
+        "dest": "api"
+  },
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/*.yml",
+		  "**.md",
+		  "**/toc.yml"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml",
+          "toc.yml",
+          "*.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "overwrite": [
+      {
+        "files": [
+          "apidoc/**.md"
+        ],
+        "exclude": [
+          "obj/**",
+          "_site/**"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default"
+    ],
+    "postProcessors": [],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

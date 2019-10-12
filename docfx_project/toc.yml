@@ -1,0 +1,18 @@
+- name: Articles
+  href: articles/
+#  homepage: api-netfx/index.md
+- name: API .NET Framework
+  href: api_merged/
+
+#- name: API .NET Framework
+#  href: api/netfx/
+#- name: API .NET Core
+#  href: api/netcore/
+#- name: API UWP
+#  href: api/uwp/
+#- name: API Android
+#  href: api/android/
+#- name: API iOS
+#  href: api/ios/
+#- name: API .NET Standard
+#  href: api/netstd/
