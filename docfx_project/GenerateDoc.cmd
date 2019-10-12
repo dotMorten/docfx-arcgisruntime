@@ -1,9 +1,8 @@
-powershell -ExecutionPolicy ByPass -command "./build.ps1 -Version 100.6.0"
+powershell -ExecutionPolicy ByPass -command "./Provision.ps1 -Version 100.6.0"
+REM Generate metadata:
+..\.tools\docfx\docfx.exe metadata 
+REM Generate metadata:
+..\.tools\docfx\docfx.exe merge
+REM Build documentation
+REM ..\.tools\docfx\docfx.exe build
 PAUSE
-SET PATH=E:\DocFX\bin;%PATH%
-REM Generate metadata:
-REM docfx.exe metadata 
-REM Generate metadata:
-REM docfx.exe merge
-REM XCOPY _api\*.* api\ /S /Y
-REM ..\bin\docfx.exe build
