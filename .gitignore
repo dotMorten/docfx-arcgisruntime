@@ -332,3 +332,6 @@ docfx_project/src/
 .tools/
 docfx_project/_site/
 docfx_project/temp/
+.packages/
+docfx_project/api/
+docfx_project/plugins/

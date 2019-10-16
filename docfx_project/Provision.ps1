@@ -4,6 +4,15 @@ param(
 )
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
+function DownloadNuGetCLI()
+{
+   if (!(Test-Path "..\.tools\nuget.exe"))
+   {
+      New-Item -ItemType Directory -Force -Path "..\.tools\docfx"
+      Write-Output "Downloading nuget..."
+      Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "..\.tools\nuget.exe"
+   }
+}
 function DownloadDocFX()
 {
    if (!(Test-Path "..\.tools\docfx\"))
@@ -14,62 +23,93 @@ function DownloadDocFX()
       [System.IO.Compression.ZipFile]::ExtractToDirectory("..\.tools\docfx.zip", "..\.tools\docfx")
    }
 }
-function DownloadNuget([string]$packageId, [string]$version)
+function DownloadPackage([string] $packageId, [string]$version)
 {
-   if (!(Test-Path "..\.tmp"))
-   {
-      New-Item -ItemType Directory -Force -Path "..\.tmp"
-   }
-   if (!(Test-Path "..\.tmp\$packageId-$version.nupkg"))
-   {
-      Write-Output "Downloading $packageId v$version..."
-      Invoke-WebRequest -Uri "https://www.nuget.org/api/v2/package/$packageId/$version" -OutFile "..\.tmp\$packageId-$version.nupkg"
-   }
-   else
-   {
-     Write-Output "$packageId v$version already downloaded"
-   }
-}
-function UnZipNuget([string]$packageId, [string]$version)
-{
-  if (!(Test-Path "..\.tmp\$packageId\$version"))
+  if (!(Test-Path "..\.packages\$version\$packageId.$version"))
   {
-    New-Item -ItemType Directory -Force -Path "..\.tmp\$packageId\$version"
-    [System.IO.Compression.ZipFile]::ExtractToDirectory("..\.tmp\$packageId\$version.nupkg", "..\.tmp\$packageId\$version")
+    ..\.tools\nuget install $packageId -version $version -OutputDirectory ..\.packages\$version\ -DirectDownload -Framework netstandard1.0
   }
 }
-function GetNugetLibs([string]$packageId, [string]$version)
+function DownloadPackages([string]$version)
 {
-  DownloadNuget -packageId $packageId -version $version
-  UnZipNuget -packageId $packageId -version $version
-  foreach($dir in Get-ChildItem -Path "..\.tmp\$packageId\$version\lib" -Directory)
+  DownloadPackage -packageId Esri.ArcGISRuntime -version $version 
+  DownloadPackage -packageId Esri.ArcGISRuntime.WPF -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.Xamarin.Android -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.Xamarin.iOS -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.UWP -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.Hydrography -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.LocalServices -version $version
+  DownloadPackage -packageId Esri.ArcGISRuntime.Xamarin.Forms -version $version
+}
+function GenerateMetadataManifest([string]$version)
+{
+  #$tfmdict = New-Object "System.Collections.Generic.Dictionary``2[System.String,List``System.String]"
+  $tfmtable = @{}
+  foreach($dir in Get-ChildItem -Path "..\.packages\$version\*\lib\" -Directory)
   {
     #Write-Output $dir | Select-Object FullName
-    $dirname = [string]($dir | Select-Object -expand Name);
+    #$tfm = [string]($dir | Select-Object -expand Name);
     $dirfullname = ($dir | Select-Object -expand FullName)
-	if (!(Test-Path "src\$version\$dirname"))
+    if ($dirfullname.contains("\Esri.ArcGISRuntime."))
     {
-      foreach($file in Get-ChildItem -Path "$dirfullname")
+  
+    foreach($tfmdir in Get-ChildItem -Path "$dirfullname" -Directory)
+    {
+      $tfm = [string]($tfmdir | Select-Object -expand Name);
+      $tfmfullname = [string]($tfmdir | Select-Object -expand FullName);
+      if (!$tfmtable.contains($tfm))
       {
-        $filename = ($file | Select-Object -expand FullName)
-        if ($filename.endswith(".dll") -Or $filename.endswith(".xml"))
+        $tfmtable.Add($tfm, @())
+      }
+      foreach($file in Get-ChildItem -Path "$tfmfullname" -File)
+      { 
+        $filename = [string]($file | Select-Object -expand FullName)
+        if ($filename.endswith(".dll"))
         {
-          Write-Output $filename
-          New-Item -ItemType Directory -Force -Path "src\$version\$dirname"
-          Copy-Item "$filename" "src\$version\$dirname\"
+          $tfmtable["$tfm"] += $tfmfullname
+          Break
         }
       }
-	}
+    }
+  }
+  }
+  New-Item "..\.packages\$version\docfx.json" -ItemType File -Value "{`n  `"metadata`":[`n" -force
+  $rootPath = Resolve-Path -Path "..\.packages\$version\";
+  foreach($tfm in $tfmtable.GetEnumerator())
+  {
+    $tfmkey = $tfm.Key
+    $folders = $tfm.Value
+    Add-Content "..\.packages\$version\docfx.json" "  {`n    `"src`":[{";
+    Add-Content "..\.packages\$version\docfx.json" "      `"files`":[";
+    foreach($foldername in $folders)
+    {
+      $fname = $foldername.replace("$rootPath","").replace("\","/")
+      Add-Content "..\.packages\$version\docfx.json" "        `"$fname`/*.dll`",";
+    }
+    Add-Content "..\.packages\$version\docfx.json" "      ],";
+    Add-Content "..\.packages\$version\docfx.json" "    }],";
+    Add-Content "..\.packages\$version\docfx.json" "    `"dest`":`".api/$tfmkey`",";
+    Add-Content "..\.packages\$version\docfx.json" "    `"properties`":{`"TargetFramework`":`"$tfmkey`"},";
+    Add-Content "..\.packages\$version\docfx.json" "  },";
+  }
+  Add-Content "..\.packages\$version\docfx.json" "  ]`n}"
+}
+function GenerateAPIMetadata([string]$version)
+{
+  DownloadPackages -version $version;
+  if (!(Test-Path "..\.packages\$version\.api"))
+  {
+    GenerateMetadataManifest($version);
+    ..\.tools\docfx\docfx.exe "..\.packages\$version\docfx.json"
   }
 }
-
-# $Version="100.6.0"
+DownloadNuGetCLI
 DownloadDocFX
-GetNugetLibs -packageId "Esri.ArcGISRuntime" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.WPF" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.Xamarin.Android" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.UWP" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.Xamarin.iOS" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.Hydrography" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.LocalServices" -version $Version
-GetNugetLibs -packageId "Esri.ArcGISRuntime.Xamarin.Forms" -version $Version
+GenerateAPIMetadata -version "100.6.0";
+GenerateAPIMetadata -version "100.5.0";
+GenerateAPIMetadata -version "100.4.0";
+GenerateAPIMetadata -version "100.3.0";
+GenerateAPIMetadata -version "100.2.1";
+GenerateAPIMetadata -version "100.2.0";
+GenerateAPIMetadata -version "100.1.0";
+GenerateAPIMetadata -version "100.0.0";

@@ -1,73 +1,4 @@
 {
-  "metadata": [
-    {
-      "src": [
-        {
-          "files": [ "src/100.6.0/net461/**.dll" ],
-        }
-      ],
-      "dest": "temp/api/net461",
-	  "properties": { "TargetFramework": "net461" }
-    },
-	{
-      "src": [
-        {
-          "files": [ "src/100.6.0/MonoAndroid10/**.dll" ]
-        }
-      ],
-      "dest": "temp/api/MonoAndroid10",
-	  "properties": { "TargetFramework": "MonoAndroid10" }
-    },
-	{
-      "src": [
-        {
-          "files": [ "src/100.6.0/netcoreapp3.0/**.dll" ]
-        }
-      ],
-      "dest": "temp/api/netcoreapp3.0",
-	  "properties": { "TargetFramework": "netcoreapp3.0" }
-    },
-	{
-      "src": [
-        {
-          "files": [ "src/100.6.0/netstandard2.0/**.dll" ]
-        }
-      ],
-      "dest": "temp/api/netstandard2.0",
-	  "properties": { "TargetFramework": "netstandard2.0" }
-    },
-	{
-      "src": [ { "files": [ "src/100.6.0/uap10.0.16299/**.dll" ] } ],
-      "dest": "temp/api/uap10.0.16299",
-	  "properties": { "TargetFramework": "uap10.0.16299" }
-    },
-	{
-      "src": [ { "files": [ "src/100.6.0/Xamarin.iOS10/**.dll" ] } ],
-      "dest": "temp/api/Xamarin.iOS10",
-	  "properties": { "TargetFramework": "Xamarin.iOS10" }
-    }
-  ],
-  "merge": {
-        "content": [
-            { "files": "*.yml", "src": "temp/api/net461", },
-			{ "files": "*.yml", "src": "temp/api/MonoAndroid10", },
-			{ "files": "*.yml", "src": "temp/api/netcoreapp3.0", },
-			{ "files": "*.yml", "src": "temp/api/netstandard2.0", },
-			{ "files": "*.yml", "src": "temp/api/uap10.0.16299", },
-			{ "files": "*.yml", "src": "temp/api/Xamarin.iOS10", }
-        ],
-        "fileMetadata": {
-            "platform": {
-                "temp/api/net461/*.yml": [ "net461" ],
-				"temp/api/MonoAndroid10/*.yml": [ "MonoAndroid10" ],
-				"temp/api/netcoreapp3.0/*.yml": [ "netcoreapp3.0" ],
-				"temp/api/netstandard2.0/*.yml": [ "netstandard2.0" ],
-				"temp/api/uap10.0.16299/*.yml": [ "uap10.0.16299" ],
-				"temp/api/Xamarin.iOS10/*.yml": [ "Xamarin.iOS10" ],
-            }
-        },
-        "dest": "api"
-  },
   "build": {
     "content": [
       {
@@ -108,7 +39,7 @@
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": [
-      "default"
+      "statictoc", "plugins/memberpage.2.46.0/content"
     ],
     "postProcessors": [],
     "markdownEngineName": "markdig",
