@@ -15,11 +15,11 @@ function DownloadNuGetCLI()
 }
 function DownloadDocFX()
 {
-   if (!(Test-Path "..\.tools\docfx\"))
+   if (!(Test-Path "..\.tools\docfx\docfx.exe"))
    {
     New-Item -ItemType Directory -Force -Path "..\.tools\docfx"
-      Write-Output "Downloading $packageId v$version..."
-      Invoke-WebRequest -Uri "https://github.com/dotnet/docfx/releases/download/v2.45.1/docfx.zip" -OutFile "..\.tools\docfx.zip"
+      Write-Output "Downloading DocFX..."
+      Invoke-WebRequest -Uri "https://github.com/dotnet/docfx/releases/download/v2.55/docfx.zip" -OutFile "..\.tools\docfx.zip"
       [System.IO.Compression.ZipFile]::ExtractToDirectory("..\.tools\docfx.zip", "..\.tools\docfx")
    }
 }
