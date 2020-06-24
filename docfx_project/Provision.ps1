@@ -1,6 +1,6 @@
 [cmdletbinding()]
 param(
-   [string]$Version="100.6.0"
+   [string]$Version="100.8.0"
 )
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
@@ -105,6 +105,8 @@ function GenerateAPIMetadata([string]$version)
 }
 DownloadNuGetCLI
 DownloadDocFX
+GenerateAPIMetadata -version "100.8.0";
+GenerateAPIMetadata -version "100.7.0";
 GenerateAPIMetadata -version "100.6.0";
 GenerateAPIMetadata -version "100.5.0";
 GenerateAPIMetadata -version "100.4.0";
